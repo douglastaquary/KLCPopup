@@ -275,16 +275,17 @@ const KLCPopupLayout KLCPopupLayoutCenter = { KLCPopupHorizontalLayoutCenter, KL
 	
   UIView* hitView = [super hitTest:point withEvent:event];
   if (hitView == self) {
-	  
-    // Try to dismiss if backgroundTouch flag set.
-    if (_shouldDismissOnBackgroundTouch) {
-		if (_keyboardInfo != nil) {
-			// We have a keyboard showing
-			[self endEditing:YES];
-		} else {
+	
+	// Try to dismiss keyboard if necessary
+	if (_keyboardInfo != nil && _shouldDismissKeyboardOnTouch) {
+		// We have a keyboard showing
+		[self endEditing:YES];
+	} else {
+		// Try to dismiss if backgroundTouch flag set.
+		if (_shouldDismissOnBackgroundTouch) {
 			[self dismiss:YES];
 		}
-    }
+	}
 	  
     // If no mask, then return nil so touch passes through to underlying views.
     if (_maskType == KLCPopupMaskTypeNone) {
