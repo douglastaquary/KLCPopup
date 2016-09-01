@@ -349,9 +349,16 @@ typedef NS_ENUM(NSInteger, CellType) {
   dismissLabel.translatesAutoresizingMaskIntoConstraints = NO;
   dismissLabel.backgroundColor = [UIColor clearColor];
   dismissLabel.textColor = [UIColor whiteColor];
-  dismissLabel.font = [UIFont boldSystemFontOfSize:72.0];
-  dismissLabel.text = @"Hi.";
-  
+  dismissLabel.font = [UIFont boldSystemFontOfSize:22.0];
+	//dismissLabel.numberOfLines = 2;
+  dismissLabel.text = @"Hello.";
+
+	UITextField *inputField = [[UITextField alloc] initWithFrame:CGRectMake(0, 0, 60, 44)];
+	inputField.backgroundColor = [UIColor blackColor];
+	inputField.translatesAutoresizingMaskIntoConstraints = NO;
+	inputField.keyboardType = UIKeyboardTypeDefault;
+	//inputField.delegate = self;
+	
   UIButton* dismissButton = [UIButton buttonWithType:UIButtonTypeCustom];
   dismissButton.translatesAutoresizingMaskIntoConstraints = NO;
   dismissButton.contentEdgeInsets = UIEdgeInsetsMake(10, 20, 10, 20);
@@ -364,16 +371,22 @@ typedef NS_ENUM(NSInteger, CellType) {
   [dismissButton addTarget:self action:@selector(dismissButtonPressed:) forControlEvents:UIControlEventTouchUpInside];
   
   [contentView addSubview:dismissLabel];
+	[contentView addSubview:inputField];
   [contentView addSubview:dismissButton];
   
-  NSDictionary* views = NSDictionaryOfVariableBindings(contentView, dismissButton, dismissLabel);
+  NSDictionary* views = NSDictionaryOfVariableBindings(contentView, dismissButton, inputField, dismissLabel);
   
   [contentView addConstraints:
-   [NSLayoutConstraint constraintsWithVisualFormat:@"V:|-(16)-[dismissLabel]-(10)-[dismissButton]-(24)-|"
+   [NSLayoutConstraint constraintsWithVisualFormat:@"V:|-(16)-[dismissLabel]-(10)-[inputField]-(10)-[dismissButton]-(24)-|"
                                            options:NSLayoutFormatAlignAllCenterX
                                            metrics:nil
                                              views:views]];
-  
+	[contentView addConstraints:
+	 [NSLayoutConstraint constraintsWithVisualFormat:@"H:|-(16)-[inputField]-(16)-|"
+											 options:0
+											 metrics:nil
+											   views:views]];
+	
   [contentView addConstraints:
    [NSLayoutConstraint constraintsWithVisualFormat:@"H:|-(36)-[dismissLabel]-(36)-|"
                                            options:0

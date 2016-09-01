@@ -117,8 +117,11 @@ extern const KLCPopupLayout KLCPopupLayoutCenter;
 // Overrides alpha value for dimmed background mask. default = 0.5
 @property (nonatomic, assign) CGFloat dimmedMaskAlpha;
 
-// If YES, then popup will get dismissed when background is touched. default = YES.
+// If YES, then popup will get dismissed when background is touched. default = NO. This affect shouldDismissKeyboardOnTouch
 @property (nonatomic, assign) BOOL shouldDismissOnBackgroundTouch;
+
+// If YES, then the keyboard will be dismissed when touched on backgroud. default = YES. This affect shouldDismissOnBackgroundTouch
+@property (nonatomic, assign) BOOL shouldDismissKeyboardOnTouch;
 
 // If YES, then popup will get dismissed when content view is touched. default = NO.
 @property (nonatomic, assign) BOOL shouldDismissOnContentTouch;

@@ -23,6 +23,7 @@
 
 
 #import "KLCPopup.h"
+#import "UIResponder+KLCPopup.h"
 
 static NSInteger const kAnimationOptionCurveIOS7 = (7 << 16);
 
@@ -52,6 +53,8 @@ const KLCPopupLayout KLCPopupLayoutCenter = { KLCPopupHorizontalLayoutCenter, KL
   BOOL _isBeingShown;
   BOOL _isShowing;
   BOOL _isBeingDismissed;
+	
+  NSDictionary *_keyboardInfo;
 }
 
 - (void)updateForInterfaceOrientation;
@@ -79,7 +82,6 @@ const KLCPopupLayout KLCPopupLayoutCenter = { KLCPopupHorizontalLayoutCenter, KL
   [[NSNotificationCenter defaultCenter] removeObserver:self];
 }
 
-
 - (id)init {
   return [self initWithFrame:[[UIScreen mainScreen] bounds]];
 }
@@ -91,11 +93,12 @@ const KLCPopupLayout KLCPopupLayoutCenter = { KLCPopupHorizontalLayoutCenter, KL
     
     self.userInteractionEnabled = YES;
     self.backgroundColor = [UIColor clearColor];
-		self.alpha = 0;
+	self.alpha = 0;
     self.autoresizingMask = UIViewAutoresizingFlexibleWidth | UIViewAutoresizingFlexibleHeight;
     self.autoresizesSubviews = YES;
     
-    self.shouldDismissOnBackgroundTouch = YES;
+    self.shouldDismissOnBackgroundTouch = NO;
+	self.shouldDismissKeyboardOnTouch = YES;
     self.shouldDismissOnContentTouch = NO;
     
     self.showType = KLCPopupShowTypeShrinkIn;
@@ -126,23 +129,163 @@ const KLCPopupLayout KLCPopupLayoutCenter = { KLCPopupHorizontalLayoutCenter, KL
                                              selector:@selector(didChangeStatusBarOrientation:)
                                                  name:UIApplicationDidChangeStatusBarFrameNotification
                                                object:nil];
+	[[NSNotificationCenter defaultCenter] addObserver:self
+											 selector:@selector(keyboardWillShow:)
+												 name:UIKeyboardWillChangeFrameNotification
+											   object:nil];
+	[[NSNotificationCenter defaultCenter] addObserver:self
+											 selector:@selector(keyboardWillHide:)
+												 name:UIKeyboardWillHideNotification
+											   object:nil];
+	  
+	  [[NSNotificationCenter defaultCenter] addObserver:self
+											   selector:@selector(keyboardDidHide:)
+												   name:UIKeyboardDidHideNotification
+												 object:nil];
+	  
+	// Observe responder change
+	[[NSNotificationCenter defaultCenter] addObserver:self
+											 selector:@selector(firstResponderDidChange)
+												 name:KLCPopupFirstResponderDidChangeNotification
+											   object:nil];
   }
   return self;
 }
 
+#pragma mark - KLCPopupFirstResponderDidChangeNotification
+
+- (void)firstResponderDidChange
+{
+	// "keyboardWillShow" won't be called if height of keyboard is not changed
+	// Manually adjust container view origin according to last keyboard info
+	[self adjustContainerViewOrigin];
+}
+
+#pragma mark - UIKeyboardWillShowNotification & UIKeyboardWillHideNotification
+
+- (void)keyboardWillShow:(NSNotification *)notification
+{
+	UIView<UIKeyInput> *currentTextInput = [self getCurrentTextInputInView:_containerView];
+	if (!currentTextInput) {
+		return;
+	}
+	
+	_keyboardInfo = notification.userInfo;
+	[self adjustContainerViewOrigin];
+}
+
+- (void)keyboardWillHide:(NSNotification *)notification
+{
+	//_keyboardInfo = nil;
+	
+	NSTimeInterval duration = [notification.userInfo[UIKeyboardAnimationDurationUserInfoKey] doubleValue];
+	UIViewAnimationCurve curve = [notification.userInfo[UIKeyboardAnimationCurveUserInfoKey] intValue];
+	
+	[UIView beginAnimations:nil context:NULL];
+	[UIView setAnimationBeginsFromCurrentState:YES];
+	[UIView setAnimationCurve:curve];
+	[UIView setAnimationDuration:duration];
+	
+	_containerView.transform = CGAffineTransformIdentity;
+	
+	[UIView commitAnimations];
+}
+
+- (void)keyboardDidHide:(NSNotification *)notification
+{
+	_keyboardInfo = nil;
+}
+
+- (void)adjustContainerViewOrigin
+{
+	if (!_keyboardInfo) {
+		return;
+	}
+	
+	UIView<UIKeyInput> *currentTextInput = [self getCurrentTextInputInView:_containerView];
+	if (!currentTextInput) {
+		return;
+	}
+	
+	CGAffineTransform lastTransform = _containerView.transform;
+	_containerView.transform = CGAffineTransformIdentity; // Set transform to identity for calculating a correct "minOffsetY"
+	
+	CGFloat textFieldBottomY = [currentTextInput convertPoint:CGPointZero toView:_containerView].y + currentTextInput.bounds.size.height;
+	CGFloat keyboardHeight = [_keyboardInfo[UIKeyboardFrameEndUserInfoKey] CGRectValue].size.height;
+	// For iOS 7
+	UIInterfaceOrientation orientation = [UIApplication sharedApplication].statusBarOrientation;
+	if (NSFoundationVersionNumber <= NSFoundationVersionNumber_iOS_7_1 &&
+		(orientation == UIInterfaceOrientationLandscapeLeft || orientation == UIInterfaceOrientationLandscapeRight)) {
+		keyboardHeight = [_keyboardInfo[UIKeyboardFrameEndUserInfoKey] CGRectValue].size.width;
+	}
+	
+	CGFloat spacing = 5;
+	CGFloat offsetY = _containerView.frame.origin.y + _containerView.bounds.size.height - (keyboardHeight + spacing);
+	if (offsetY <= 0) { // _containerView can be totally shown, so no need to reposition
+		return;
+	}
+	
+	CGFloat statusBarHeight = [UIApplication sharedApplication].statusBarFrame.size.height;
+	
+	if (_containerView.frame.origin.y - offsetY < statusBarHeight) { // _containerView will be covered by status bar if it is repositioned with "offsetY"
+		offsetY = _containerView.frame.origin.y - statusBarHeight;
+		// currentTextField can not be totally shown if _containerView is going to repositioned with "offsetY"
+		if (textFieldBottomY - offsetY > _containerView.bounds.size.height - keyboardHeight - spacing) {
+			offsetY = textFieldBottomY - (_containerView.bounds.size.height - keyboardHeight - spacing);
+		}
+	}
+	
+	NSTimeInterval duration = [_keyboardInfo[UIKeyboardAnimationDurationUserInfoKey] doubleValue];
+	UIViewAnimationCurve curve = [_keyboardInfo[UIKeyboardAnimationCurveUserInfoKey] intValue];
+	
+	_containerView.transform = lastTransform; // Restore transform
+	
+	[UIView beginAnimations:nil context:NULL];
+	[UIView setAnimationBeginsFromCurrentState:YES];
+	[UIView setAnimationCurve:curve];
+	[UIView setAnimationDuration:duration];
+	
+	_containerView.transform = CGAffineTransformMakeTranslation(0, -offsetY);
+	
+	[UIView commitAnimations];
+}
+
+- (UIView<UIKeyInput> *)getCurrentTextInputInView:(UIView *)view
+{
+	if ([view conformsToProtocol:@protocol(UIKeyInput)] && view.isFirstResponder) {
+		// Quick fix for web view issue
+		if ([view isKindOfClass:NSClassFromString(@"UIWebBrowserView")] || [view isKindOfClass:NSClassFromString(@"WKContentView")]) {
+			return nil;
+		}
+		return (UIView<UIKeyInput> *)view;
+	}
+	
+	for (UIView *subview in view.subviews) {
+		UIView<UIKeyInput> *view = [self getCurrentTextInputInView:subview];
+		if (view) {
+			return view;
+		}
+	}
+	return nil;
+}
 
 #pragma mark - UIView
 
 - (UIView *)hitTest:(CGPoint)point withEvent:(UIEvent *)event {
-  
+	
   UIView* hitView = [super hitTest:point withEvent:event];
   if (hitView == self) {
-    
+	  
     // Try to dismiss if backgroundTouch flag set.
     if (_shouldDismissOnBackgroundTouch) {
-      [self dismiss:YES];
+		if (_keyboardInfo != nil) {
+			// We have a keyboard showing
+			[self endEditing:YES];
+		} else {
+			[self dismiss:YES];
+		}
     }
-    
+	  
     // If no mask, then return nil so touch passes through to underlying views.
     if (_maskType == KLCPopupMaskTypeNone) {
       return nil;

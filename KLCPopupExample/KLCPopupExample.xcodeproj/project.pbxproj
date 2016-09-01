@@ -22,6 +22,7 @@
 		1FA76ADE195893080075A8E4 /* InfoPlist.strings in Resources */ = {isa = PBXBuildFile; fileRef = 1FA76ADC195893080075A8E4 /* InfoPlist.strings */; };
 		1FA76AE0195893080075A8E4 /* KLCPopupExampleTests.m in Sources */ = {isa = PBXBuildFile; fileRef = 1FA76ADF195893080075A8E4 /* KLCPopupExampleTests.m */; };
 		1FA76AF01958A2130075A8E4 /* KLCPopup.m in Sources */ = {isa = PBXBuildFile; fileRef = 1FA76AEF1958A2130075A8E4 /* KLCPopup.m */; };
+		B9BD7B7A1D776D0200897416 /* UIResponder+KLCPopup.m in Sources */ = {isa = PBXBuildFile; fileRef = B9BD7B791D776D0200897416 /* UIResponder+KLCPopup.m */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXContainerItemProxy section */
@@ -56,6 +57,8 @@
 		1FA76ADF195893080075A8E4 /* KLCPopupExampleTests.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = KLCPopupExampleTests.m; sourceTree = "<group>"; };
 		1FA76AEE1958A2130075A8E4 /* KLCPopup.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = KLCPopup.h; sourceTree = "<group>"; };
 		1FA76AEF1958A2130075A8E4 /* KLCPopup.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = KLCPopup.m; sourceTree = "<group>"; };
+		B9BD7B791D776D0200897416 /* UIResponder+KLCPopup.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = "UIResponder+KLCPopup.m"; sourceTree = "<group>"; };
+		B9BD7B7B1D776D1500897416 /* UIResponder+KLCPopup.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = "UIResponder+KLCPopup.h"; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -160,6 +163,8 @@
 		1FA76AED1958A2130075A8E4 /* KLCPopup */ = {
 			isa = PBXGroup;
 			children = (
+				B9BD7B7B1D776D1500897416 /* UIResponder+KLCPopup.h */,
+				B9BD7B791D776D0200897416 /* UIResponder+KLCPopup.m */,
 				1FA76AEE1958A2130075A8E4 /* KLCPopup.h */,
 				1FA76AEF1958A2130075A8E4 /* KLCPopup.m */,
 			);
@@ -267,6 +272,7 @@
 				1FA76ACB195893080075A8E4 /* ViewController.m in Sources */,
 				1FA76ABE195893080075A8E4 /* main.m in Sources */,
 				1FA76AC2195893080075A8E4 /* AppDelegate.m in Sources */,
+				B9BD7B7A1D776D0200897416 /* UIResponder+KLCPopup.m in Sources */,
 				1FA76AF01958A2130075A8E4 /* KLCPopup.m in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
