@@ -177,6 +177,7 @@ extern const KLCPopupLayout KLCPopupLayoutCenter;
 @property (nonatomic, assign, readonly) BOOL isBeingShown;
 @property (nonatomic, assign, readonly) BOOL isShowing;
 @property (nonatomic, assign, readonly) BOOL isBeingDismissed;
+@property (nonatomic, assign, readonly) BOOL isHidingKeyboard;
 
 - (void)willStartShowing;
 - (void)didFinishShowing;

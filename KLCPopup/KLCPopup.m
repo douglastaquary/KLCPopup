@@ -53,6 +53,7 @@ const KLCPopupLayout KLCPopupLayoutCenter = { KLCPopupHorizontalLayoutCenter, KL
   BOOL _isBeingShown;
   BOOL _isShowing;
   BOOL _isBeingDismissed;
+  BOOL _isHidingKeyboard;
 	
   NSDictionary *_keyboardInfo;
 }
@@ -73,6 +74,7 @@ const KLCPopupLayout KLCPopupLayoutCenter = { KLCPopupHorizontalLayoutCenter, KL
 @synthesize isBeingShown = _isBeingShown;
 @synthesize isShowing = _isShowing;
 @synthesize isBeingDismissed = _isBeingDismissed;
+@synthesize isHidingKeyboard = _isHidingKeyboard;
 
 
 - (void)dealloc {
@@ -109,6 +111,7 @@ const KLCPopupLayout KLCPopupLayoutCenter = { KLCPopupHorizontalLayoutCenter, KL
     _isBeingShown = NO;
     _isShowing = NO;
     _isBeingDismissed = NO;
+	_isHidingKeyboard = NO;
     
     _backgroundView = [[UIView alloc] init];
     _backgroundView.backgroundColor = [UIColor clearColor];
@@ -165,6 +168,7 @@ const KLCPopupLayout KLCPopupLayoutCenter = { KLCPopupHorizontalLayoutCenter, KL
 
 - (void)keyboardWillShow:(NSNotification *)notification
 {
+	if (_isHidingKeyboard) { return ; }
 	UIView<UIKeyInput> *currentTextInput = [self getCurrentTextInputInView:_containerView];
 	if (!currentTextInput) {
 		return;
@@ -176,7 +180,7 @@ const KLCPopupLayout KLCPopupLayoutCenter = { KLCPopupHorizontalLayoutCenter, KL
 
 - (void)keyboardWillHide:(NSNotification *)notification
 {
-	//_keyboardInfo = nil;
+	_isHidingKeyboard = YES;
 	
 	NSTimeInterval duration = [notification.userInfo[UIKeyboardAnimationDurationUserInfoKey] doubleValue];
 	UIViewAnimationCurve curve = [notification.userInfo[UIKeyboardAnimationCurveUserInfoKey] intValue];
@@ -193,6 +197,7 @@ const KLCPopupLayout KLCPopupLayoutCenter = { KLCPopupHorizontalLayoutCenter, KL
 
 - (void)keyboardDidHide:(NSNotification *)notification
 {
+	_isHidingKeyboard = NO;
 	_keyboardInfo = nil;
 }
 
@@ -206,6 +211,8 @@ const KLCPopupLayout KLCPopupLayoutCenter = { KLCPopupHorizontalLayoutCenter, KL
 	if (!currentTextInput) {
 		return;
 	}
+	
+	if (_isHidingKeyboard) { return; }
 	
 	CGAffineTransform lastTransform = _containerView.transform;
 	_containerView.transform = CGAffineTransformIdentity; // Set transform to identity for calculating a correct "minOffsetY"
