@@ -286,7 +286,11 @@ const KLCPopupLayout KLCPopupLayoutCenter = { KLCPopupHorizontalLayoutCenter, KL
 	// Try to dismiss keyboard if necessary
 	if (_keyboardInfo != nil && _shouldDismissKeyboardOnTouch) {
 		// We have a keyboard showing
-		[self endEditing:YES];
+		UIView<UIKeyInput> *currentTextInput = [self getCurrentTextInputInView:_containerView];
+		if (currentTextInput) {
+			[(UITextField*)currentTextInput resignFirstResponder];
+		}
+		//[self endEditing:YES];
 	} else {
 		// Try to dismiss if backgroundTouch flag set.
 		if (_shouldDismissOnBackgroundTouch) {
