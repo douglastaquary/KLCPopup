@@ -26,56 +26,56 @@
 typedef NS_ENUM(NSInteger, KLCPopupShowType) {
 	KLCPopupShowTypeNone = 0,
 	KLCPopupShowTypeFadeIn,
-  KLCPopupShowTypeGrowIn,
-  KLCPopupShowTypeShrinkIn,
-  KLCPopupShowTypeSlideInFromTop,
-  KLCPopupShowTypeSlideInFromBottom,
-  KLCPopupShowTypeSlideInFromLeft,
-  KLCPopupShowTypeSlideInFromRight,
-  KLCPopupShowTypeBounceIn,
-  KLCPopupShowTypeBounceInFromTop,
-  KLCPopupShowTypeBounceInFromBottom,
-  KLCPopupShowTypeBounceInFromLeft,
-  KLCPopupShowTypeBounceInFromRight,
+	KLCPopupShowTypeGrowIn,
+	KLCPopupShowTypeShrinkIn,
+	KLCPopupShowTypeSlideInFromTop,
+	KLCPopupShowTypeSlideInFromBottom,
+	KLCPopupShowTypeSlideInFromLeft,
+	KLCPopupShowTypeSlideInFromRight,
+	KLCPopupShowTypeBounceIn,
+	KLCPopupShowTypeBounceInFromTop,
+	KLCPopupShowTypeBounceInFromBottom,
+	KLCPopupShowTypeBounceInFromLeft,
+	KLCPopupShowTypeBounceInFromRight,
 };
 
 // KLCPopupDismissType: Controls how the popup will be dismissed.
 typedef NS_ENUM(NSInteger, KLCPopupDismissType) {
 	KLCPopupDismissTypeNone = 0,
 	KLCPopupDismissTypeFadeOut,
-  KLCPopupDismissTypeGrowOut,
-  KLCPopupDismissTypeShrinkOut,
-  KLCPopupDismissTypeSlideOutToTop,
-  KLCPopupDismissTypeSlideOutToBottom,
-  KLCPopupDismissTypeSlideOutToLeft,
-  KLCPopupDismissTypeSlideOutToRight,
-  KLCPopupDismissTypeBounceOut,
-  KLCPopupDismissTypeBounceOutToTop,
-  KLCPopupDismissTypeBounceOutToBottom,
-  KLCPopupDismissTypeBounceOutToLeft,
-  KLCPopupDismissTypeBounceOutToRight,
+	KLCPopupDismissTypeGrowOut,
+	KLCPopupDismissTypeShrinkOut,
+	KLCPopupDismissTypeSlideOutToTop,
+	KLCPopupDismissTypeSlideOutToBottom,
+	KLCPopupDismissTypeSlideOutToLeft,
+	KLCPopupDismissTypeSlideOutToRight,
+	KLCPopupDismissTypeBounceOut,
+	KLCPopupDismissTypeBounceOutToTop,
+	KLCPopupDismissTypeBounceOutToBottom,
+	KLCPopupDismissTypeBounceOutToLeft,
+	KLCPopupDismissTypeBounceOutToRight,
 };
 
 
 
 // KLCPopupHorizontalLayout: Controls where the popup will come to rest horizontally.
 typedef NS_ENUM(NSInteger, KLCPopupHorizontalLayout) {
-  KLCPopupHorizontalLayoutCustom = 0,
-  KLCPopupHorizontalLayoutLeft,
-  KLCPopupHorizontalLayoutLeftOfCenter,
-  KLCPopupHorizontalLayoutCenter,
-  KLCPopupHorizontalLayoutRightOfCenter,
-  KLCPopupHorizontalLayoutRight,
+	KLCPopupHorizontalLayoutCustom = 0,
+	KLCPopupHorizontalLayoutLeft,
+	KLCPopupHorizontalLayoutLeftOfCenter,
+	KLCPopupHorizontalLayoutCenter,
+	KLCPopupHorizontalLayoutRightOfCenter,
+	KLCPopupHorizontalLayoutRight,
 };
 
 // KLCPopupVerticalLayout: Controls where the popup will come to rest vertically.
 typedef NS_ENUM(NSInteger, KLCPopupVerticalLayout) {
-  KLCPopupVerticalLayoutCustom = 0,
+	KLCPopupVerticalLayoutCustom = 0,
 	KLCPopupVerticalLayoutTop,
-  KLCPopupVerticalLayoutAboveCenter,
-  KLCPopupVerticalLayoutCenter,
-  KLCPopupVerticalLayoutBelowCenter,
-  KLCPopupVerticalLayoutBottom,
+	KLCPopupVerticalLayoutAboveCenter,
+	KLCPopupVerticalLayoutCenter,
+	KLCPopupVerticalLayoutBelowCenter,
+	KLCPopupVerticalLayoutBottom,
 };
 
 // KLCPopupMaskType
@@ -87,8 +87,8 @@ typedef NS_ENUM(NSInteger, KLCPopupMaskType) {
 
 // KLCPopupLayout structure and maker functions
 struct KLCPopupLayout {
-  KLCPopupHorizontalLayout horizontal;
-  KLCPopupVerticalLayout vertical;
+	KLCPopupHorizontalLayout horizontal;
+	KLCPopupVerticalLayout vertical;
 };
 typedef struct KLCPopupLayout KLCPopupLayout;
 
@@ -140,11 +140,11 @@ extern const KLCPopupLayout KLCPopupLayoutCenter;
 
 // Convenience method for creating popup with custom values.
 + (KLCPopup*)popupWithContentView:(UIView*)contentView
-                         showType:(KLCPopupShowType)showType
-                      dismissType:(KLCPopupDismissType)dismissType
-                         maskType:(KLCPopupMaskType)maskType
-         dismissOnBackgroundTouch:(BOOL)shouldDismissOnBackgroundTouch
-            dismissOnContentTouch:(BOOL)shouldDismissOnContentTouch;
+						 showType:(KLCPopupShowType)showType
+					  dismissType:(KLCPopupDismissType)dismissType
+						 maskType:(KLCPopupMaskType)maskType
+		 dismissOnBackgroundTouch:(BOOL)shouldDismissOnBackgroundTouch
+			dismissOnContentTouch:(BOOL)shouldDismissOnContentTouch;
 
 // Dismisses all the popups in the app. Use as a fail-safe for cleaning up.
 + (void)dismissAllPopups;
