@@ -107,6 +107,7 @@ const KLCPopupLayout KLCPopupLayoutCenter = { KLCPopupHorizontalLayoutCenter, KL
 		self.dismissType = KLCPopupDismissTypeShrinkOut;
 		self.maskType = KLCPopupMaskTypeDimmed;
 		self.dimmedMaskAlpha = 0.5;
+		self.textFieldBottomBreathing = 5.0;
 		
 		_isBeingShown = NO;
 		_isShowing = NO;
@@ -129,7 +130,7 @@ const KLCPopupLayout KLCPopupLayoutCenter = { KLCPopupHorizontalLayoutCenter, KL
 		
 		UITapGestureRecognizer *tapGestureRecognizer = [[UITapGestureRecognizer alloc] initWithTarget:self action:@selector(handleTapFrom:)];
 		[self addGestureRecognizer:tapGestureRecognizer];
-		tapGestureRecognizer.delegate = self;
+		//tapGestureRecognizer.delegate = self;
 		
 		// register for notifications
 		[[NSNotificationCenter defaultCenter] addObserver:self
@@ -155,6 +156,25 @@ const KLCPopupLayout KLCPopupLayoutCenter = { KLCPopupHorizontalLayoutCenter, KL
 												   object:nil];
 	}
 	return self;
+}
+
+- (UIView<UIKeyInput> *)getCurrentTextInputInView:(UIView *)view
+{
+	if ([view conformsToProtocol:@protocol(UIKeyInput)] && view.isFirstResponder) {
+		// Quick fix for web view issue
+		if ([view isKindOfClass:NSClassFromString(@"UIWebBrowserView")] || [view isKindOfClass:NSClassFromString(@"WKContentView")]) {
+			return nil;
+		}
+		return (UIView<UIKeyInput> *)view;
+	}
+	
+	for (UIView *subview in view.subviews) {
+		UIView<UIKeyInput> *view = [self getCurrentTextInputInView:subview];
+		if (view) {
+			return view;
+		}
+	}
+	return nil;
 }
 
 - (void) handleTapFrom: (UITapGestureRecognizer *)recognizer
@@ -234,70 +254,43 @@ const KLCPopupLayout KLCPopupLayoutCenter = { KLCPopupHorizontalLayoutCenter, KL
 	
 	if (_isHidingKeyboard) { return; }
 	
-	dispatch_async( dispatch_get_main_queue(), ^{
-		CGAffineTransform lastTransform = _containerView.transform;
-		_containerView.transform = CGAffineTransformIdentity; // Set transform to identity for calculating a correct "minOffsetY"
-		
-		CGFloat textFieldBottomY = [currentTextInput convertPoint:CGPointZero toView:_containerView].y + currentTextInput.bounds.size.height;
-		CGFloat keyboardHeight = [_keyboardInfo[UIKeyboardFrameEndUserInfoKey] CGRectValue].size.height;
-		
-		// For iOS 7
-		UIInterfaceOrientation orientation = [UIApplication sharedApplication].statusBarOrientation;
-		if (NSFoundationVersionNumber <= NSFoundationVersionNumber_iOS_7_1 &&
-			(orientation == UIInterfaceOrientationLandscapeLeft || orientation == UIInterfaceOrientationLandscapeRight)) {
-			keyboardHeight = [_keyboardInfo[UIKeyboardFrameEndUserInfoKey] CGRectValue].size.width;
-		}
-		
-		CGFloat spacing = 5;
-		CGFloat offsetY = _containerView.frame.origin.y + _containerView.bounds.size.height - (keyboardHeight + spacing);
-		if (offsetY <= 0) { // _containerView can be totally shown, so no need to reposition
-			return;
-		}
-		
-		CGFloat statusBarHeight = [UIApplication sharedApplication].statusBarFrame.size.height;
-		
-		if (_containerView.frame.origin.y - offsetY < statusBarHeight) { // _containerView will be covered by status bar if it is repositioned with "offsetY"
-			offsetY = _containerView.frame.origin.y - statusBarHeight;
-			// currentTextField can not be totally shown if _containerView is going to repositioned with "offsetY"
-			if (textFieldBottomY - offsetY > _containerView.bounds.size.height - keyboardHeight - spacing) {
-				offsetY = textFieldBottomY - (_containerView.bounds.size.height - keyboardHeight - spacing);
-			}
-		}
-		
-		NSTimeInterval duration = [_keyboardInfo[UIKeyboardAnimationDurationUserInfoKey] doubleValue];
-		UIViewAnimationCurve curve = [_keyboardInfo[UIKeyboardAnimationCurveUserInfoKey] intValue];
-		
-		_containerView.transform = lastTransform; // Restore transform
-		
-		[UIView beginAnimations:nil context:NULL];
-		[UIView setAnimationBeginsFromCurrentState:YES];
-		[UIView setAnimationCurve:curve];
-		[UIView setAnimationDuration:duration];
-		
-		_containerView.transform = CGAffineTransformMakeTranslation(0, -offsetY);
-		
-		[UIView commitAnimations];
-	});
-}
-
-- (UIView<UIKeyInput> *)getCurrentTextInputInView:(UIView *)view
-{
-	if ([view conformsToProtocol:@protocol(UIKeyInput)] && view.isFirstResponder) {
-		// Quick fix for web view issue
-		if ([view isKindOfClass:NSClassFromString(@"UIWebBrowserView")] || [view isKindOfClass:NSClassFromString(@"WKContentView")]) {
-			return nil;
-		}
-		return (UIView<UIKeyInput> *)view;
+	CGAffineTransform lastTransform = _containerView.transform;
+	_containerView.transform = CGAffineTransformIdentity; // Set transform to identity for calculating a correct "minOffsetY"
+	
+	UIView *mainWindowView = [[[[UIApplication sharedApplication] keyWindow] subviews] lastObject];
+	CGFloat textFieldBottomY = [currentTextInput convertPoint:CGPointZero toView:mainWindowView].y + currentTextInput.bounds.size.height;
+	CGFloat keyboardHeight = [_keyboardInfo[UIKeyboardFrameEndUserInfoKey] CGRectValue].size.height;
+	CGFloat spacing = 5;
+	CGFloat offsetY = (mainWindowView.bounds.size.height - (keyboardHeight + _textFieldBottomBreathing)) - textFieldBottomY;
+	
+	// For iOS 7
+	UIInterfaceOrientation orientation = [UIApplication sharedApplication].statusBarOrientation;
+	if (NSFoundationVersionNumber <= NSFoundationVersionNumber_iOS_7_1 &&
+		(orientation == UIInterfaceOrientationLandscapeLeft || orientation == UIInterfaceOrientationLandscapeRight)) {
+		keyboardHeight = [_keyboardInfo[UIKeyboardFrameEndUserInfoKey] CGRectValue].size.width;
+		offsetY = (mainWindowView.bounds.size.width - (keyboardHeight + spacing)) - textFieldBottomY;
 	}
 	
-	for (UIView *subview in view.subviews) {
-		UIView<UIKeyInput> *view = [self getCurrentTextInputInView:subview];
-		if (view) {
-			return view;
-		}
+	if (offsetY >= 0) { // _containerView can be totally shown, so no need to reposition
+		return;
 	}
-	return nil;
+	
+	NSTimeInterval duration = [_keyboardInfo[UIKeyboardAnimationDurationUserInfoKey] doubleValue];
+	UIViewAnimationCurve curve = [_keyboardInfo[UIKeyboardAnimationCurveUserInfoKey] intValue];
+	
+	_containerView.transform = lastTransform; // Restore transform
+	
+	[UIView beginAnimations:nil context:NULL];
+	[UIView setAnimationBeginsFromCurrentState:YES];
+	[UIView setAnimationCurve:curve];
+	[UIView setAnimationDuration:duration];
+	
+	_containerView.transform = CGAffineTransformMakeTranslation(0, offsetY);
+	
+	[UIView commitAnimations];
 }
+
+
 
 #pragma mark - Class Public
 
@@ -668,6 +661,8 @@ const KLCPopupLayout KLCPopupLayoutCenter = { KLCPopupHorizontalLayoutCenter, KL
 			
 			// Prepare by adding to the top window.
 			if(!self.superview){
+				[[[UIApplication sharedApplication] keyWindow] addSubview:self];
+				/*
 				NSEnumerator *frontToBackWindows = [[[UIApplication sharedApplication] windows] reverseObjectEnumerator];
 				
 				for (UIWindow *window in frontToBackWindows) {
@@ -676,7 +671,7 @@ const KLCPopupLayout KLCPopupLayoutCenter = { KLCPopupHorizontalLayoutCenter, KL
 						
 						break;
 					}
-				}
+				}*/
 			}
 			
 			// Before we calculate layout for containerView, make sure we are transformed for current orientation.

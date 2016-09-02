@@ -349,9 +349,9 @@ typedef NS_ENUM(NSInteger, CellType) {
   dismissLabel.translatesAutoresizingMaskIntoConstraints = NO;
   dismissLabel.backgroundColor = [UIColor clearColor];
   dismissLabel.textColor = [UIColor whiteColor];
-  dismissLabel.font = [UIFont boldSystemFontOfSize:22.0];
-	//dismissLabel.numberOfLines = 2;
-  dismissLabel.text = @"Hello.";
+  dismissLabel.font = [UIFont boldSystemFontOfSize:72.0];
+  dismissLabel.numberOfLines = 2;
+  dismissLabel.text = @"Hello.\nWorld";
 
 	UITextField *inputField = [[UITextField alloc] initWithFrame:CGRectMake(0, 0, 60, 44)];
 	inputField.backgroundColor = [UIColor blackColor];
@@ -403,6 +403,8 @@ typedef NS_ENUM(NSInteger, CellType) {
                                           maskType:(KLCPopupMaskType)[self valueForRow:_selectedRowInMaskField inFieldWithTag:FieldTagMaskType]
                           dismissOnBackgroundTouch:_shouldDismissOnBackgroundTouch
                              dismissOnContentTouch:_shouldDismissOnContentTouch];
+	
+	popup.textFieldBottomBreathing = 20.0;
   
   if (_shouldDismissAfterDelay) {
     [popup showWithLayout:layout duration:2.0];

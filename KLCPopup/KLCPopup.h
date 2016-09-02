@@ -117,6 +117,9 @@ extern const KLCPopupLayout KLCPopupLayoutCenter;
 // Overrides alpha value for dimmed background mask. default = 0.5
 @property (nonatomic, assign) CGFloat dimmedMaskAlpha;
 
+// The ammount of "breathing" of UITextfield Bottom aboce the keyboard when editing. default = 5.0
+@property (nonatomic, assign) CGFloat textFieldBottomBreathing;
+
 // If YES, then popup will get dismissed when background is touched. default = NO. This affect shouldDismissKeyboardOnTouch
 @property (nonatomic, assign) BOOL shouldDismissOnBackgroundTouch;
 

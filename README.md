@@ -121,7 +121,8 @@ Use these blocks to synchronize other actions with popup events:
 	[popup show];
 
 ## Notes
-
+This version is only to include the Keyboard Handle.
+	
 ### Interface Orientation
 `KLCPopup` supports **Portrait** and **Landscape** by default.
 
@@ -135,7 +136,6 @@ Use these blocks to synchronize other actions with popup events:
 `KLCPopup` requires ARC.
 
 ### TODO
-- Add support for keyboard show/hide.
 - Add support for drag-to-dismiss.
 - Add 'blur' option for background mask
 
