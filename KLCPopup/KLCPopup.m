@@ -190,7 +190,8 @@ const KLCPopupLayout KLCPopupLayoutCenter = { KLCPopupHorizontalLayoutCenter, KL
 	} else {
 		// Try to dismiss if backgroundTouch flag set.
 		if (_shouldDismissOnBackgroundTouch) {
-			[self dismiss:YES];
+			[KLCPopup dismissAllPopups];
+			//[self dismiss:YES];
 		}
 	}
 }
