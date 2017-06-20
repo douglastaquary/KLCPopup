@@ -662,8 +662,10 @@ const KLCPopupLayout KLCPopupLayoutCenter = { KLCPopupHorizontalLayoutCenter, KL
 			
 			// Prepare by adding to the top window.
 			if(!self.superview){
+				[[[[UIApplication sharedApplication] windows] lastObject] addSubview:self];
 				//[[[UIApplication sharedApplication] keyWindow] addSubview:self];
 				
+				/*
 				NSEnumerator *frontToBackWindows = [[[UIApplication sharedApplication] windows] reverseObjectEnumerator];
 				
 				for (UIWindow *window in frontToBackWindows) {
@@ -673,6 +675,7 @@ const KLCPopupLayout KLCPopupLayoutCenter = { KLCPopupHorizontalLayoutCenter, KL
 						break;
 					}
 				}
+				 */
 			}
 			
 			// Before we calculate layout for containerView, make sure we are transformed for current orientation.
