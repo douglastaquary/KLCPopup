@@ -662,7 +662,7 @@ const KLCPopupLayout KLCPopupLayoutCenter = { KLCPopupHorizontalLayoutCenter, KL
 			
 			// Prepare by adding to the top window.
 			if(!self.superview){
-				[[[[UIApplication sharedApplication] windows] lastObject] addSubview:self];
+				[[[[UIApplication sharedApplication] windows] firstObject] addSubview:self];
 				//[[[UIApplication sharedApplication] keyWindow] addSubview:self];
 				
 				/*
